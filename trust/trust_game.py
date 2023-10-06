@@ -1,4 +1,4 @@
-from trust.player import BasePlayer
+from trust.players import BasePlayer
 from trust.actions import TrustGameActions
 
 outcomes = {

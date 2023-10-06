@@ -1,7 +1,7 @@
 import pytest
 from trust.trust_game import play_game
 from trust.actions import TrustGameActions
-from trust.player import AlwaysCooperate, Player
+from trust.players import AlwaysCooperatePlayer, RandomPlayer
 
 def mock_action_cheat():
     return TrustGameActions.CHEAT
@@ -15,14 +15,14 @@ def test_invalid_player_types_in_play_game():
 
 def test_invalid_num_games_in_play_game():
     with pytest.raises(ValueError):
-        play_game(Player(), Player(), 0)
+        play_game(RandomPlayer(), RandomPlayer(), 0)
 
 def test_invalid_num_games_in_play_game():
     with pytest.raises(TypeError):
-        play_game(Player(), Player(), 'a')
+        play_game(RandomPlayer(), RandomPlayer(), 'a')
 
 def test_p1_cheat_p2_cheat(monkeypatch):
-    player1, player2 = Player(), Player()
+    player1, player2 = RandomPlayer(), RandomPlayer()
 
     monkeypatch.setattr(player1, 'action', mock_action_cheat)
     monkeypatch.setattr(player2, 'action', mock_action_cheat)
@@ -32,7 +32,7 @@ def test_p1_cheat_p2_cheat(monkeypatch):
     assert player2.score == 0
 
 def test_p1_cheat_p2_cooperate(monkeypatch):
-    player1, player2 = Player(), Player()
+    player1, player2 = RandomPlayer(), RandomPlayer()
 
     monkeypatch.setattr(player1, 'action', mock_action_cheat)
     monkeypatch.setattr(player2, 'action', mock_action_cooperate)
@@ -42,7 +42,7 @@ def test_p1_cheat_p2_cooperate(monkeypatch):
     assert player2.score == -1
 
 def test_p1_cooperate_p2_cheat(monkeypatch):
-    player1, player2 = Player(), Player()
+    player1, player2 = RandomPlayer(), RandomPlayer()
 
     monkeypatch.setattr(player1, 'action', mock_action_cooperate)
     monkeypatch.setattr(player2, 'action', mock_action_cheat)
@@ -52,7 +52,7 @@ def test_p1_cooperate_p2_cheat(monkeypatch):
     assert player2.score == 3
 
 def test_p1_cooperate_p2_cooperate(monkeypatch):
-    player1, player2 = Player(), Player()
+    player1, player2 = RandomPlayer(), RandomPlayer()
 
     monkeypatch.setattr(player1, 'action', mock_action_cooperate)
     monkeypatch.setattr(player2, 'action', mock_action_cooperate)
@@ -62,7 +62,7 @@ def test_p1_cooperate_p2_cooperate(monkeypatch):
     assert player2.score == 2
 
 def test_always_cooperate_10_games():
-    player1, player2 = AlwaysCooperate(), AlwaysCooperate()
+    player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
     play_game(player1, player2, num_games=10)
     assert player1.score == 20
     assert player2.score == 20

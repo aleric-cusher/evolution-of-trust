@@ -10,10 +10,11 @@ class BasePlayer(ABC):
     def action(self):
         ...
 
-class Player(BasePlayer):
+class RandomPlayer(BasePlayer):
     def action(self) -> TrustGameActions:
         return random.choice([i for i in TrustGameActions])
 
-class AlwaysCooperate(BasePlayer):
+class AlwaysCooperatePlayer(BasePlayer):
     def action(self) -> TrustGameActions:
         return TrustGameActions.COOPERATE
+    
