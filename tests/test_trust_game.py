@@ -10,17 +10,25 @@ def mock_action_cheat():
 def mock_action_cooperate():
     return TrustGameActions.COOPERATE
 
-def test_invalid_player_types_in_play_game():
-    with pytest.raises(TypeError):
-        play_game('a', 4)
+class TestPlayGame:
+    def test_invalid_player_types_in_play_game(self):
+        with pytest.raises(TypeError):
+            play_game('a', 4)
 
-def test_invalid_num_games_in_play_game():
-    with pytest.raises(ValueError):
-        play_game(RandomPlayer(), RandomPlayer(), 0)
+    def test_invalid_num_games_in_play_game(self):
+        with pytest.raises(ValueError):
+            play_game(RandomPlayer(), RandomPlayer(), 0)
 
-def test_invalid_num_games_in_play_game():
-    with pytest.raises(TypeError):
-        play_game(RandomPlayer(), RandomPlayer(), 'a')
+    def test_invalid_num_games_in_play_game(self):
+        with pytest.raises(TypeError):
+            play_game(RandomPlayer(), RandomPlayer(), 'a')
+    
+    def test_valid_run(self):
+        try:
+            play_game(AlwaysCooperatePlayer(), AlwaysCooperatePlayer())
+        except Exception as e:
+            assert False, f'Exception {e}'
+
 
 
 class TestAllActionCombinations:
