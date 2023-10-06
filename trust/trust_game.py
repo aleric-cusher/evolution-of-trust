@@ -12,8 +12,8 @@ outcomes = {
     (TrustGameActions.COOPERATE, TrustGameActions.COOPERATE): (2, 2),    
 }
 
-def play_game(player1_choice, player2_choice):
-    if not (isinstance(player1_choice, TrustGameActions) and isinstance(player2_choice, TrustGameActions)):
+def play_game(player1_action, player2_action):
+    if not (isinstance(player1_action, TrustGameActions) and isinstance(player2_action, TrustGameActions)):
         raise TypeError('Invalid player actions')
-    return outcomes[(player1_choice, player2_choice)]
+    return outcomes[(player1_action, player2_action)]
     
