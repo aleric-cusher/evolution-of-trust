@@ -4,6 +4,13 @@ class TrustGameActions(Enum):
     CHEAT = auto()
     COOPERATE = auto()
 
+class AlwaysCooperate:
+    def __init__(self) -> None:
+        self.score = 0
+    
+    def action(self):
+        return TrustGameActions.COOPERATE
+
 outcomes = {
     (TrustGameActions.CHEAT, TrustGameActions.CHEAT): (0, 0),
     (TrustGameActions.CHEAT, TrustGameActions.COOPERATE): (3, -1),
