@@ -1,11 +1,25 @@
 import pytest
-from trust.player import AlwaysCooperate
+import random
+from trust.player import AlwaysCooperate, Player
 from trust.trust_game import TrustGameActions
 
-def test_player_creation():
-    player = AlwaysCooperate()
-    assert player.score == 0
+class TestPlayer:
+    def test_creation(self):
+        player = Player()
+        assert player.score == 0
 
-def test_player_alwayscooperate_action():
-    player = AlwaysCooperate()
-    assert player.action() == TrustGameActions.COOPERATE
+    def test_player_action(self):
+        player = Player()
+        random.seed(0)
+        assert player.action() == TrustGameActions.COOPERATE
+        assert player.action() == TrustGameActions.COOPERATE
+        assert player.action() == TrustGameActions.CHEAT
+
+class TestAlwaysCooperate:
+    def test_creation(self):
+        player = AlwaysCooperate()
+        assert player.score == 0
+
+    def test_player_action(self):
+        player = AlwaysCooperate()
+        assert player.action() == TrustGameActions.COOPERATE
