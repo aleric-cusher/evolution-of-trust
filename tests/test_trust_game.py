@@ -4,11 +4,6 @@ from trust.trust_game import play_game
 from trust.actions import TrustGameActions
 from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer
 
-def mock_action_cheat():
-        return TrustGameActions.CHEAT
-
-def mock_action_cooperate():
-    return TrustGameActions.COOPERATE
 
 class TestPlayGame:
     def test_invalid_player_types_in_play_game(self):
@@ -86,6 +81,9 @@ class TestGamesBetweenSamePlayers:
     
 
 class TestGamesBetweenDifferentPlayers:
+    def mock_action_cheat(self, *args):
+        return TrustGameActions.CHEAT
+    
     def test_alwayscooperate_alwayscheat_10_games(self):
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCheatPlayer()
         play_game(player1, player2, num_games=10)
@@ -100,14 +98,18 @@ class TestGamesBetweenDifferentPlayers:
     
     parameters = [
         # (player1_class, player2_class, num_games, player1_score, player2_score)
-        (RandomPlayer, AlwaysCheatPlayer, 10, -8, 24),
-        (RandomPlayer, AlwaysCooperatePlayer, 10, 22, 14),
+        (RandomPlayer, AlwaysCheatPlayer, 10, 0, 0),
+        (RandomPlayer, AlwaysCooperatePlayer, 10, 30, -10),
     ]
 
     @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', parameters)
-    def test_games_between_different_players(self, player1_class, player2_class, num_games, player1_score, player2_score):
-        random.seed(0)
+    def test_games_between_different_players(self, mocker, player1_class, player2_class, num_games, player1_score, player2_score):
+        mocker.patch('random.choice', self.mock_action_cheat)
+        spy = mocker.spy(random, 'choice')
+
         player1, player2 = player1_class(), player2_class()
         play_game(player1, player2, num_games=num_games)
+
         assert player1.score == player1_score
         assert player2.score == player2_score
+        assert spy.call_count == num_games
