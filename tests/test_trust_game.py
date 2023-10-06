@@ -1,5 +1,6 @@
 import pytest
-from trust.trust_game import play_game, TrustGameActions, AlwaysCooperate
+from trust.trust_game import play_game, TrustGameActions
+from trust.player import AlwaysCooperate
 
 def test_p1_cheat_p2_cheat():
     player1_outcome, player2_outcome = play_game(TrustGameActions.CHEAT, TrustGameActions.CHEAT)
