@@ -61,7 +61,19 @@ def test_p1_cooperate_p2_cooperate(monkeypatch):
     assert player1.score == 2
     assert player2.score == 2
 
-def test_always_cooperate_10_games():
+def test_always_cooperate_player_games():
+    player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
+    play_game(player1, player2)
+    assert player1.score == 2
+    assert player2.score == 2
+
+def test_always_cooperate_player_10_games():
+    player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
+    play_game(player1, player2, num_games=5)
+    assert player1.score == 10
+    assert player2.score == 10
+
+def test_always_cooperate_player_10_games():
     player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
     play_game(player1, player2, num_games=10)
     assert player1.score == 20
