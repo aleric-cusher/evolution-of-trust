@@ -1,4 +1,5 @@
 import pytest
+import random
 from trust.trust_game import play_game
 from trust.actions import TrustGameActions
 from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer
@@ -81,3 +82,29 @@ class TestGamesBetweenSamePlayers:
         assert player2.score == 0
     
 
+class TestGamesBetweenDifferentPlayers:
+    def test_alwayscooperate_alwayscheat_10_games(self):
+        player1, player2 = AlwaysCooperatePlayer(), AlwaysCheatPlayer()
+        play_game(player1, player2, num_games=10)
+        assert player1.score == -10
+        assert player2.score == 30
+    
+    def test_alwayscooperate_alwayscheat_10_games_opposite(self):
+        player1, player2 = AlwaysCheatPlayer(), AlwaysCooperatePlayer()
+        play_game(player1, player2, num_games=10)
+        assert player1.score == 30
+        assert player2.score == -10
+    
+    parameters = [
+        # (player1_class, player2_class, num_games, player1_score, player2_score)
+        (RandomPlayer, AlwaysCheatPlayer, 10, -8, 24),
+        (RandomPlayer, AlwaysCooperatePlayer, 10, 22, 14),
+    ]
+
+    @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', parameters)
+    def test_games_between_different_players(self, player1_class, player2_class, num_games, player1_score, player2_score):
+        random.seed(0)
+        player1, player2 = player1_class(), player2_class()
+        play_game(player1, player2, num_games=num_games)
+        assert player1.score == player1_score
+        assert player2.score == player2_score
