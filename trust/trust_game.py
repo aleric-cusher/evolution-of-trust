@@ -1,9 +1,5 @@
-from enum import Enum, auto
-
-class TrustGameActions(Enum):
-    CHEAT = auto()
-    COOPERATE = auto()
-
+from trust.player import BasePlayer
+from trust.actions import TrustGameActions
 
 outcomes = {
     (TrustGameActions.CHEAT, TrustGameActions.CHEAT): (0, 0),
@@ -12,8 +8,10 @@ outcomes = {
     (TrustGameActions.COOPERATE, TrustGameActions.COOPERATE): (2, 2),    
 }
 
-def play_game(player1_action, player2_action):
-    if not (isinstance(player1_action, TrustGameActions) and isinstance(player2_action, TrustGameActions)):
+def play_game(player1, player2):
+    if not (isinstance(player1, BasePlayer) and isinstance(player2, BasePlayer)):
         raise TypeError('Invalid player actions')
-    return outcomes[(player1_action, player2_action)]
+    player1_outcome, player2_outcome =  outcomes[(player1.action(), player2.action())]
+    player1.score += player1_outcome
+    player2.score += player2_outcome
     
