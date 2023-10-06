@@ -1,7 +1,7 @@
 import pytest
 from trust.trust_game import play_game
 from trust.actions import TrustGameActions
-from trust.players import AlwaysCooperatePlayer, RandomPlayer
+from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer
 
 def mock_action_cheat():
         return TrustGameActions.CHEAT
@@ -42,14 +42,15 @@ class TestAllActionCombinations:
         assert player1.score == player1_score
         assert player2.score == player2_score
 
-class TestGamesBetweenTwoPlayers:
+
+class TestGamesBetweenSamePlayers:
     def test_always_cooperate_player_games(self):
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
         play_game(player1, player2)
         assert player1.score == 2
         assert player2.score == 2
 
-    def test_always_cooperate_player_10_games(self):
+    def test_always_cooperate_player_5_games(self):
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
         play_game(player1, player2, num_games=5)
         assert player1.score == 10
@@ -60,3 +61,23 @@ class TestGamesBetweenTwoPlayers:
         play_game(player1, player2, num_games=10)
         assert player1.score == 20
         assert player2.score == 20
+
+    def test_always_cheat_player_games(self):
+        player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
+        play_game(player1, player2)
+        assert player1.score == 0
+        assert player2.score == 0
+
+    def test_always_cheat_player_5_games(self):
+        player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
+        play_game(player1, player2, num_games=5)
+        assert player1.score == 0
+        assert player2.score == 0
+
+    def test_always_cheat_player_10_games(self):
+        player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
+        play_game(player1, player2, num_games=10)
+        assert player1.score == 0
+        assert player2.score == 0
+    
+
