@@ -4,7 +4,7 @@ class TrustGameActions(Enum):
     CHEAT = auto()
     COOPERATE = auto()
 
-    
+
 outcomes = {
     (TrustGameActions.CHEAT, TrustGameActions.CHEAT): (0, 0),
     (TrustGameActions.CHEAT, TrustGameActions.COOPERATE): (3, -1),
@@ -13,5 +13,7 @@ outcomes = {
 }
 
 def play_game(player1_choice, player2_choice):
+    if not (isinstance(player1_choice, TrustGameActions) and isinstance(player2_choice, TrustGameActions)):
+        raise TypeError('Invalid player actions')
     return outcomes[(player1_choice, player2_choice)]
     
