@@ -15,3 +15,8 @@ def test_p1_cooperate_p2_cheat():
     player1_outcome, player2_outcome = play_game(TrustGameActions.COOPERATE, TrustGameActions.CHEAT)
     assert player1_outcome == -1
     assert player2_outcome == 3
+
+def test_p1_cooperate_p2_cooperate():
+    player1_outcome, player2_outcome = play_game(TrustGameActions.COOPERATE, TrustGameActions.COOPERATE)
+    assert player1_outcome == 2
+    assert player2_outcome == 2
