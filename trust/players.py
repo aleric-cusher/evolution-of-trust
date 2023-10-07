@@ -4,9 +4,6 @@ from abc import ABC, abstractmethod
 
 
 class BasePlayer(ABC):
-    def __init__(self) -> None:
-        self.score = 0
-    
     @abstractmethod
     def action(self):
         ...
