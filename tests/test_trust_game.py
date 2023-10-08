@@ -2,10 +2,10 @@ import pytest
 import random
 from trust.trust_game import TrustGame
 from trust.actions import TrustGameActions
-from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer
+from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer
 
 
-class TestPlayGame:
+class TestTrustGame:
     def test_valid_run(self):
         try:
             game = TrustGame(AlwaysCooperatePlayer(), AlwaysCooperatePlayer())
@@ -36,6 +36,36 @@ class TestPlayGame:
         with pytest.raises(TypeError):
             game.play_game('a')
 
+    def test_update_player_scores_method(self):
+        player1_instance, player2_instance = RandomPlayer(), RandomPlayer()
+        game = TrustGame(player1_instance, player2_instance)
+
+        game.update_player_scores((400, 145))
+
+        assert game.player1_score == 400
+        assert game.player2_score == 145
+
+    def test_update_player_actions(self):
+        player1_instance, player2_instance = RandomPlayer(), RandomPlayer()
+        game = TrustGame(player1_instance, player2_instance)
+
+        game.update_player_actions((TrustGameActions.COOPERATE, TrustGameActions.CHEAT))
+        game.update_player_actions((TrustGameActions.CHEAT, TrustGameActions.CHEAT))
+
+        game.player1_actions == [TrustGameActions.COOPERATE, TrustGameActions.CHEAT]
+        game.player2_actions == [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
+    
+    def test_get_scorecard_method(self):
+        player1_instance, player2_instance = RandomPlayer(), RandomPlayer()
+        game = TrustGame(player1_instance, player2_instance)
+        
+        game.player1_actions.append(TrustGameActions.CHEAT)
+        game.player1_score = 3
+        game.player2_score = 2000
+
+        assert game._get_scorecard() == {player1_instance: {'score': 3, 'actions': [TrustGameActions.CHEAT]},
+                                         player2_instance: {'score': 2000, 'actions': []}}
+
 
 class TestAllActionCombinations:
     combination_parameters = [
@@ -56,20 +86,6 @@ class TestAllActionCombinations:
 
 
 class TestGamesBetweenSamePlayers:
-    def test_always_cooperate_player_games(self):
-        player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
-        game = TrustGame(player1, player2)
-        game.play_game()
-        assert game.player1_score == 2
-        assert game.player2_score == 2
-
-    def test_always_cooperate_player_5_games(self):
-        player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
-        game = TrustGame(player1, player2)
-        game.play_game(5)
-        assert game.player1_score == 10
-        assert game.player2_score == 10
-
     def test_always_cooperate_player_10_games(self):
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
         game = TrustGame(player1, player2)
@@ -77,26 +93,19 @@ class TestGamesBetweenSamePlayers:
         assert game.player1_score == 20
         assert game.player2_score == 20
 
-    def test_always_cheat_player_games(self):
-        player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
-        game = TrustGame(player1, player2)
-        game.play_game()
-        assert game.player1_score == 0
-        assert game.player2_score == 0
-
-    def test_always_cheat_player_5_games(self):
-        player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
-        game = TrustGame(player1, player2)
-        game.play_game(5)
-        assert game.player1_score == 0
-        assert game.player2_score == 0
-
     def test_always_cheat_player_10_games(self):
         player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
         assert game.player1_score == 0
         assert game.player2_score == 0
+    
+    def test_copycat_player_10_games(self):
+        player1, player2 = CopycatPlayer(), CopycatPlayer()
+        game = TrustGame(player1, player2)
+        game.play_game(10)
+        assert game.player1_score == 20
+        assert game.player2_score == 20
     
 
 class TestGamesBetweenDifferentPlayers:
@@ -117,14 +126,14 @@ class TestGamesBetweenDifferentPlayers:
         assert game.player1_score == 30
         assert game.player2_score == -10
     
-    parameters = [
+    with_random_player_parameters = [
         # (player1_class, player2_class, num_games, player1_score, player2_score)
         (RandomPlayer, AlwaysCheatPlayer, 10, 0, 0),
         (RandomPlayer, AlwaysCooperatePlayer, 10, 30, -10),
     ]
 
-    @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', parameters)
-    def test_games_between_different_players(self, mocker, player1_class, player2_class, num_games, player1_score, player2_score):
+    @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', with_random_player_parameters)
+    def test_games_between_different_players_with_randomplayer(self, mocker, player1_class, player2_class, num_games, player1_score, player2_score):
         mocker.patch('random.choice', self.mock_action_cheat)
         spy = mocker.spy(random, 'choice')
 
@@ -135,3 +144,19 @@ class TestGamesBetweenDifferentPlayers:
         assert game.player1_score == player1_score
         assert game.player2_score == player2_score
         assert spy.call_count == num_games
+    
+    without_random_player_parameters = [
+        # (player1_class, player2_class, num_games, player1_score, player2_score)
+        (CopycatPlayer, AlwaysCooperatePlayer, 10, 20, 20),
+        (CopycatPlayer, AlwaysCheatPlayer, 10, -1, 3),
+        
+    ]
+
+    @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', without_random_player_parameters)
+    def test_games_between_different_players_without_randomplayer(self, player1_class, player2_class, num_games, player1_score, player2_score):
+        player1, player2 = player1_class(), player2_class()
+        game = TrustGame(player1, player2)
+        game.play_game(num_games)
+
+        assert game.player1_score == player1_score
+        assert game.player2_score == player2_score

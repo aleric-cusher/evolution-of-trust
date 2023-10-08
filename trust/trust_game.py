@@ -18,10 +18,22 @@ class TrustGame:
         self.player2 = player2
         self.player1_score = 0
         self.player2_score = 0
+        self.player1_actions = []
+        self.player2_actions = []
+    
+    def _get_scorecard(self):
+        return {
+            self.player1: {'score': self.player1_score, 'actions': self.player1_actions},
+            self.player2: {'score': self.player2_score, 'actions': self.player2_actions}
+        }
 
-    def update_player_score(self, scores):
+    def update_player_scores(self, scores):
         self.player1_score += scores[0]
         self.player2_score += scores[1]
+
+    def update_player_actions(self, actions):
+        self.player1_actions.append(actions[0])
+        self.player2_actions.append(actions[1])
     
     def play_game(self, num_games: int = 1) -> None:
         if not isinstance(num_games, int):
@@ -30,7 +42,10 @@ class TrustGame:
             raise ValueError('Cannot play 0 or negative games.')
         
         for _ in range(num_games):
-            scores =  self.outcomes[(self.player1.action(), self.player2.action())]
-            self.update_player_score(scores)
+            scorecard = self._get_scorecard()
+            player1_action, player2_action = self.player1.action(scorecard), self.player2.action(scorecard)
+            scores =  self.outcomes[(player1_action, player2_action)]
+            self.update_player_scores(scores)
+            self.update_player_actions((player1_action, player2_action))
             
         
