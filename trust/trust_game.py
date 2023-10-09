@@ -1,5 +1,7 @@
+from typing import Optional, Iterable, Any
 from trust.players import BasePlayer
 from trust.actions import TrustGameActions
+import itertools
 
 
 class TrustGame:
@@ -10,30 +12,41 @@ class TrustGame:
         (TrustGameActions.COOPERATE, TrustGameActions.COOPERATE): (2, 2),    
     }
 
-    def __init__(self, player1: BasePlayer, player2: BasePlayer) -> None:
-        if not (isinstance(player1, BasePlayer) and isinstance(player2, BasePlayer)):
-            raise TypeError('Invalid player class.')
+    def __init__(self, players:Optional[list[BasePlayer]] = None) -> None:
+        if players is not None:
+            for player in players:
+                if not isinstance(player, BasePlayer):
+                    raise TypeError('Invalid player class.')
 
-        self.player1 = player1
-        self.player2 = player2
-        self.player1_score = 0
-        self.player2_score = 0
-        self.player1_actions = []
-        self.player2_actions = []
+        self.players = players
+        self.scorecard = {player: {'score': 0, 'actions': []} for player in self.players}
     
-    def _get_scorecard(self):
+    def _get_player_combinations(self) -> Iterable[Iterable(BasePlayer, BasePlayer)]:
+        unique_combinations = []
+        for combination in itertools.combinations(self.players, 2):
+            unique_combinations.append(combination)
+        return unique_combinations
+    
+    def _get_scorecard(self, player1: BasePlayer, player2: BasePlayer) -> dict[BasePlayer, dict[str, Any]]:
         return {
-            self.player1: {'score': self.player1_score, 'actions': self.player1_actions},
-            self.player2: {'score': self.player2_score, 'actions': self.player2_actions}
+            player1: self.scorecard[player1],
+            player2: self.scorecard[player2]
         }
 
-    def update_player_scores(self, scores):
-        self.player1_score += scores[0]
-        self.player2_score += scores[1]
+    def update_player_scores(self, scores: Iterable[int], player1: BasePlayer, player2: BasePlayer) -> None:
+        self.scorecard[player1]['score'] += scores[0]
+        self.scorecard[player2]['score'] += scores[1]
 
-    def update_player_actions(self, actions):
-        self.player1_actions.append(actions[0])
-        self.player2_actions.append(actions[1])
+    def update_player_actions(self, actions: Iterable[TrustGameActions], player1: BasePlayer, player2: BasePlayer) -> None:
+        self.scorecard[player1]['actions'].append(actions[0])
+        self.scorecard[player2]['actions'].append(actions[1])
+    
+    def play_2_players(self, player1: BasePlayer, player2: BasePlayer) -> None:
+        scorecard = self._get_scorecard(player1, player2)
+        player1_action, player2_action = player1.action(scorecard), player2.action(scorecard)
+        scores =  self.outcomes[(player1_action, player2_action)]
+        self.update_player_scores(scores, player1, player2)
+        self.update_player_actions((player1_action, player2_action), player1, player2)
     
     def play_game(self, num_games: int = 1) -> None:
         if not isinstance(num_games, int):
@@ -42,10 +55,5 @@ class TrustGame:
             raise ValueError('Cannot play 0 or negative games.')
         
         for _ in range(num_games):
-            scorecard = self._get_scorecard()
-            player1_action, player2_action = self.player1.action(scorecard), self.player2.action(scorecard)
-            scores =  self.outcomes[(player1_action, player2_action)]
-            self.update_player_scores(scores)
-            self.update_player_actions((player1_action, player2_action))
-            
-        
+            for player1, player2 in self._get_player_combinations():
+                self.play_2_players(player1, player2)
