@@ -2,7 +2,7 @@ import pytest
 import random
 from trust.trust_game import TrustGame
 from trust.actions import TrustGameActions
-from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer
+from trust.players import AlwaysCooperatePlayer, DetectivePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer
 
 
 class TestTrustGame:
@@ -114,6 +114,13 @@ class TestGamesBetweenSamePlayers:
         assert game.player1_score == 20
         assert game.player2_score == 20
     
+    def test_detective_player_10_games(self):
+        player1, player2 = DetectivePlayer(), DetectivePlayer()
+        game = TrustGame(player1, player2)
+        game.play_game(10)
+        assert game.player1_score == 18
+        assert game.player2_score == 18
+    
 
 class TestGamesBetweenDifferentPlayers:
     def mock_action_cheat(self, *args):
@@ -159,6 +166,10 @@ class TestGamesBetweenDifferentPlayers:
         (GrudgePlayer, AlwaysCheatPlayer, 10, -1, 3),        
         (GrudgePlayer, AlwaysCooperatePlayer, 10, 20, 20),
         (GrudgePlayer, CopycatPlayer, 10, 20, 20),
+        (DetectivePlayer, CopycatPlayer, 10, 18, 18),
+        (DetectivePlayer, AlwaysCheatPlayer, 10, -3, 9),
+        (DetectivePlayer, AlwaysCooperatePlayer, 10, 27, -1),
+        (DetectivePlayer, GrudgePlayer, 10, 3, 7),
     ]
 
     @pytest.mark.parametrize('player1_class, player2_class, num_games, player1_score, player2_score', without_random_player_parameters)
