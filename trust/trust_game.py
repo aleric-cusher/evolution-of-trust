@@ -32,6 +32,10 @@ class TrustGame:
             player1: self.scorecard[player1],
             player2: self.scorecard[player2]
         }
+    
+    def _reset_actions(self, player1: BasePlayer, player2: BasePlayer) -> None:
+        self.scorecard[player1]['actions'] = []
+        self.scorecard[player2]['actions'] = []
 
     def update_player_scores(self, scores: Iterable[int], player1: BasePlayer, player2: BasePlayer) -> None:
         self.scorecard[player1]['score'] += scores[0]
@@ -41,19 +45,20 @@ class TrustGame:
         self.scorecard[player1]['actions'].append(actions[0])
         self.scorecard[player2]['actions'].append(actions[1])
     
-    def play_2_players(self, player1: BasePlayer, player2: BasePlayer) -> None:
-        scorecard = self._get_scorecard(player1, player2)
-        player1_action, player2_action = player1.action(scorecard), player2.action(scorecard)
-        scores =  self.outcomes[(player1_action, player2_action)]
-        self.update_player_scores(scores, player1, player2)
-        self.update_player_actions((player1_action, player2_action), player1, player2)
-    
-    def play_game(self, num_games: int = 1) -> None:
+    def play_game(self, player1: BasePlayer, player2: BasePlayer, num_games: int = 1) -> None:
         if not isinstance(num_games, int):
             raise TypeError('num_games should be of type int.')
         if num_games < 1:
             raise ValueError('Cannot play 0 or negative games.')
         
         for _ in range(num_games):
-            for player1, player2 in self._get_player_combinations():
-                self.play_2_players(player1, player2)
+            scorecard = self._get_scorecard(player1, player2)
+            player1_action, player2_action = player1.action(scorecard), player2.action(scorecard)
+            scores =  self.outcomes[(player1_action, player2_action)]
+            self.update_player_scores(scores, player1, player2)
+            self.update_player_actions((player1_action, player2_action), player1, player2)
+    
+    def play_tournament(self, rounds_per_match: int = 10) -> None:
+        for player1, player2 in self._get_player_combinations():
+            self.play_game(player1, player2, rounds_per_match)
+            self._reset_actions(player1, player2)
