@@ -1,6 +1,6 @@
 import pytest
 import random
-from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer
+from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer
 from trust.trust_game import TrustGameActions
 
 
@@ -50,3 +50,23 @@ class TestCopycatplayer:
         assert player1.action(scorecard) == TrustGameActions.COOPERATE
         assert player2.action(scorecard) == TrustGameActions.COOPERATE
 
+class TestGrudgePlayer:
+    def test_player_action(self):
+        player1 = GrudgePlayer()
+        player2 = GrudgePlayer()
+        scorecard = {
+            player1: {'score': 0, 'actions': [TrustGameActions.COOPERATE]},
+            player2: {'score': 0, 'actions': [TrustGameActions.COOPERATE]}
+        }
+        assert player1.action(scorecard) == TrustGameActions.COOPERATE
+        assert player2.action(scorecard) == TrustGameActions.COOPERATE
+
+    def test_player_action_once_cheated(self):
+        player1 = GrudgePlayer()
+        player2 = GrudgePlayer()
+        scorecard = {
+            player1: {'score': 0, 'actions': [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]},
+            player2: {'score': 0, 'actions': [TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]}
+        }
+        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        assert player2.action(scorecard) == TrustGameActions.COOPERATE

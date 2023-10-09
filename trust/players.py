@@ -33,3 +33,12 @@ class CopycatPlayer(BasePlayer):
         if len(other_player_actions) < 1:
             return TrustGameActions.COOPERATE
         return other_player_actions[-1]
+
+class GrudgePlayer(BasePlayer):
+    def action(self, scorecard: dict[BasePlayer, dict[str, Any]]):
+        other_player = [player for player in scorecard.keys() if player != self][0]
+        other_player_actions = scorecard[other_player]['actions']
+        if TrustGameActions.CHEAT in other_player_actions:
+            return TrustGameActions.CHEAT
+        return TrustGameActions.COOPERATE
+        
