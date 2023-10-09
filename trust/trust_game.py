@@ -21,7 +21,7 @@ class TrustGame:
         self.players = players
         self.scorecard = {player: {'score': 0, 'actions': []} for player in self.players}
     
-    def _get_player_combinations(self) -> Iterable[Iterable(BasePlayer, BasePlayer)]:
+    def _get_player_combinations(self) -> Iterable[Iterable[BasePlayer]]:
         unique_combinations = []
         for combination in itertools.combinations(self.players, 2):
             unique_combinations.append(combination)
