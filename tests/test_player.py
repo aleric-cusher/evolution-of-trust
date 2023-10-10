@@ -20,128 +20,82 @@ class TestRandomPlayer:
 class TestAlwaysCooperatePlayer:
     def test_player_action(self):
         player = AlwaysCooperatePlayer()
+
         assert player.action() == TrustGameActions.COOPERATE
 
     
 class TestAlwaysCheatPlayer:
     def test_player_action(self):
         player = AlwaysCheatPlayer()
+
         assert player.action() == TrustGameActions.CHEAT
 
 
 class TestCopycatplayer:
     def test_player_action(self):
-        player1 = CopycatPlayer()
-        player2 = CopycatPlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': [TrustGameActions.COOPERATE]},
-            player2: {'score': 0, 'actions': [TrustGameActions.CHEAT]}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
-        assert player2.action(scorecard) == TrustGameActions.COOPERATE
+        player = CopycatPlayer()
+        
+        assert player.action([TrustGameActions.CHEAT]) == TrustGameActions.CHEAT
+        assert player.action([TrustGameActions.COOPERATE]) == TrustGameActions.COOPERATE
 
-    def test_player_action_empty_scorecard(self):
-        player1 = CopycatPlayer()
-        player2 = CopycatPlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': []},
-            player2: {'score': 0, 'actions': []}
-        }
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
-        assert player2.action(scorecard) == TrustGameActions.COOPERATE
+    def test_player_action_empty_history(self):
+        player = CopycatPlayer()
+
+        assert player.action([]) == TrustGameActions.COOPERATE
+
 
 class TestGrudgePlayer:
     def test_player_action(self):
-        player1 = GrudgePlayer()
-        player2 = GrudgePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': [TrustGameActions.COOPERATE]},
-            player2: {'score': 0, 'actions': [TrustGameActions.COOPERATE]}
-        }
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
-        assert player2.action(scorecard) == TrustGameActions.COOPERATE
+        player = GrudgePlayer()
+        
+        assert player.action([TrustGameActions.COOPERATE]) == TrustGameActions.COOPERATE
 
     def test_player_action_once_cheated(self):
-        player1 = GrudgePlayer()
-        player2 = GrudgePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]},
-            player2: {'score': 0, 'actions': [TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
-        assert player2.action(scorecard) == TrustGameActions.COOPERATE
+        player = GrudgePlayer()
+        
+        assert player.action([TrustGameActions.CHEAT, TrustGameActions.COOPERATE]) == TrustGameActions.CHEAT
     
+
 class TestDetectivePlayer:
+    start_sequence = [TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
+    # TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE
+    
     def test_starting_action_sequence(self):
-        # TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE
-        player1 = DetectivePlayer()
-        player2 = DetectivePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': []},
-            player2: {'score': 0, 'actions': []}
-        }
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
+        player = DetectivePlayer()
 
-        scorecard = {**scorecard, player1: {'actions': [TrustGameActions.COOPERATE]}}
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
-
-        scorecard = {**scorecard, player1: {'actions': [TrustGameActions.COOPERATE, TrustGameActions.CHEAT]}}
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
-
-        scorecard = {**scorecard, player1: {'actions': [TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE]}}
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
+        assert player.action([]) == TrustGameActions.COOPERATE
+        assert player.action([]) == TrustGameActions.CHEAT
+        assert player.action([]) == TrustGameActions.COOPERATE
+        assert player.action([]) == TrustGameActions.COOPERATE
 
     def test_copycat_behaviour_after_starting_sequence(self):
-        start_sequence = [TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
-        player1 = DetectivePlayer()
-        player2 = DetectivePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence + [TrustGameActions.COOPERATE]},
-            player2: {'score': 0, 'actions': start_sequence + [TrustGameActions.CHEAT]}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        player = DetectivePlayer()
+        
+        player._action_history = self.start_sequence
+        history = [TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
+        assert player.action(history) == TrustGameActions.COOPERATE
 
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence + [TrustGameActions.COOPERATE, TrustGameActions.CHEAT]},
-            player2: {'score': 0, 'actions': start_sequence + [TrustGameActions.CHEAT, TrustGameActions.COOPERATE]}
-        }
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
+        player._action_history = self.start_sequence
+        history = [TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.CHEAT]
+        assert player.action(history) == TrustGameActions.CHEAT
 
     def test_alwayscheat_behaviour_after_starting_sequence(self):
-        start_sequence = [TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
-        player1 = DetectivePlayer()
-        player2 = DetectivePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence},
-            player2: {'score': 0, 'actions': [TrustGameActions.COOPERATE] * 4}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        player = DetectivePlayer()
 
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence + [TrustGameActions.CHEAT]},
-            player2: {'score': 0, 'actions': [TrustGameActions.COOPERATE] * 5}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        player._action_history = self.start_sequence
+        history = [TrustGameActions.COOPERATE] * 4
+        assert player.action(history) == TrustGameActions.CHEAT
 
     def test_switch_from_always_cheat_to_copycat(self):
-        start_sequence = [TrustGameActions.COOPERATE, TrustGameActions.CHEAT, TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
-        player1 = DetectivePlayer()
-        player2 = DetectivePlayer()
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence},
-            player2: {'score': 0, 'actions': [TrustGameActions.COOPERATE] * 4}
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        player = DetectivePlayer()
 
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence + [TrustGameActions.CHEAT]},
-            player2: {'score': 0, 'actions': ([TrustGameActions.COOPERATE] * 4) + [TrustGameActions.CHEAT] }
-        }
-        assert player1.action(scorecard) == TrustGameActions.CHEAT
+        player._action_history = self.start_sequence
+        history = [TrustGameActions.COOPERATE] * 4
+        assert player.action(history) == TrustGameActions.CHEAT
 
-        scorecard = {
-            player1: {'score': 0, 'actions': start_sequence + [TrustGameActions.CHEAT, TrustGameActions.CHEAT]},
-            player2: {'score': 0, 'actions': ([TrustGameActions.COOPERATE] * 4) + [TrustGameActions.CHEAT, TrustGameActions.COOPERATE] }
-        }
-        assert player1.action(scorecard) == TrustGameActions.COOPERATE
+        history = history + [TrustGameActions.CHEAT]
+        assert player.action(history) == TrustGameActions.CHEAT
+
+        history  = history + [TrustGameActions.COOPERATE]
+        assert player.action(history) == TrustGameActions.COOPERATE
     
