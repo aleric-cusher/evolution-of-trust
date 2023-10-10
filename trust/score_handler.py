@@ -1,6 +1,5 @@
 from copy import deepcopy
 from typing import Any, Dict, List
-from trust.actions import TrustGameActions
 from trust.players import BasePlayer
 
 

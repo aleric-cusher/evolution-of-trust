@@ -1,4 +1,4 @@
-
+import pytest
 from trust.actions import TrustGameActions
 from trust.score_handler import ScoreHandler
 from trust.players import RandomPlayer, AlwaysCheatPlayer, AlwaysCooperatePlayer
@@ -108,3 +108,9 @@ class TestScoreHandler:
         score_handler3 = score_handler1.add_score_handlers(score_handler2)
         
         assert score_handler3.get_scorecard() == expected_scorecard
+    
+    def test_invalid_type_handler(self):
+        player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
+        score_handler1 = ScoreHandler([player1, player2, player3])
+        with pytest.raises(TypeError):
+            score_handler3 = score_handler1.add_score_handlers('score_handler2')
