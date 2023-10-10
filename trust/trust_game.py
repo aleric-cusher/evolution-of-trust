@@ -35,3 +35,27 @@ class TrustGame:
         
         return self.score_handler
 
+
+class TrustTournament:
+    def __init__(self, players: List[BasePlayer]) -> None:
+        if not isinstance(players, list):
+            raise TypeError('players parameter is not of the type list')
+        for player in players:
+            if not isinstance(player, BasePlayer):
+                raise TypeError('Invalid player class.')
+
+        self.players = players
+        self.score_handler = ScoreHandler(self.players)
+
+    def play_tournament(self, rounds_per_match: int = 10) -> None:
+        for player1, player2 in itertools.combinations(self.players, 2):
+            game = TrustGame(player1, player2)
+            new_score_handler = game.play_game(rounds_per_match)
+
+            self.score_handler.add_score_handlers(new_score_handler)
+
+            player1.reset_history()
+            player2.reset_history()
+        
+        return self.score_handler
+
