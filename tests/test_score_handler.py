@@ -84,5 +84,27 @@ class TestScoreHandler:
         
         assert scorecard_object == test_card
 
+    def test_add_scores(self):
+        player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
+        score_handler1 = ScoreHandler([player1, player2, player3])
+        score_handler1.scorecard = {
+            player1: 5,
+            player2: 6,
+            player3: 2,
+        }
+
+        score_handler2 = ScoreHandler([player1, player3])
+        score_handler2.scorecard = {
+            player1: -3,
+            player3: 8
+        }
+
+        expected_scorecard = {
+            player1: 2,
+            player2: 6,
+            player3: 10
+        }
+
+        score_handler3 = score_handler1.add_score_handlers(score_handler2)
         
-    
+        assert score_handler3.get_scorecard() == expected_scorecard
