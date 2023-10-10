@@ -12,16 +12,19 @@ class BasePlayer(ABC):
         super().__init__()
         self._action_history = []
     
-    def update_and_return_action_history(self, action: TrustGameActions):
+    def update_and_return_action_history(self, action: TrustGameActions) -> TrustGameActions:
         self._action_history.append(action)
         return action
     
     @abstractmethod
-    def action(self, opponent_history: Optional[List[TrustGameActions]] = None):
+    def action(self, opponent_history: Optional[List[TrustGameActions]] = None) -> TrustGameActions:
         ...
 
-    def get_action_history(self):
+    def get_action_history(self) -> List[TrustGameActions]:
         return deepcopy(self._action_history)
+    
+    def reset_history(self) -> None:
+        self._action_history = []
 
 
 class RandomPlayer(BasePlayer):

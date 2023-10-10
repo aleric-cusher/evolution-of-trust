@@ -1,8 +1,23 @@
+from typing import List, Optional
 import pytest
 import random
-from trust.players import AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer, DetectivePlayer
+from trust.players import BasePlayer, AlwaysCooperatePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer, DetectivePlayer
 from trust.trust_game import TrustGameActions
 
+class TestBasePlayer:
+    class Player(BasePlayer):
+        def action(self, opponent_history: List[TrustGameActions] | None = None):
+            return self.update_and_return_action_history(TrustGameActions.CHEAT)
+    
+    def test_base_player_reset_history(self):
+        player = self.Player()
+        assert player.action() == TrustGameActions.CHEAT
+        assert player.action() == TrustGameActions.CHEAT
+        assert player._action_history == [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
+
+        player.reset_history()
+
+        assert player._action_history == []
 
 class TestRandomPlayer:
     def mock_random_choice(self, *args):
