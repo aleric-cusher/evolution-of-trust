@@ -21,17 +21,21 @@ class BasePlayer:
         self._action_history = []
         self.behaviour = behaviour
     
-    def update_and_return_action_history(self, action: TrustGameActions) -> TrustGameActions:
+    def _update_and_return_action_history(self, action: TrustGameActions) -> TrustGameActions:
         self._action_history.append(action)
         return action
 
     def get_action_history(self) -> List[TrustGameActions]:
         return deepcopy(self._action_history)
     
-    def action(self, opponent_history: Optional[List[TrustGameActions]] = None) -> TrustGameActions:
+    def action(self, opponent: BasePlayer) -> TrustGameActions:
         if self.behaviour is None:
             raise Exception('Please define a behaviour')
-        return self.update_and_return_action_history(self.behaviour.get_action(opponent_history, self.get_action_history()))
+        opponent_history = opponent.get_action_history()
+        self_history = self.get_action_history()
+        min_index = min([len(opponent_history), len(self_history)])
+        action = self.behaviour.get_action(opponent_history[: min_index], self_history[: min_index])
+        return self._update_and_return_action_history(action)
     
     def reset_history(self) -> None:
         self._action_history = []

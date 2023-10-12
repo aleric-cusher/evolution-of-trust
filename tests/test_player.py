@@ -16,8 +16,8 @@ from trust.trust_game import TrustGameActions
 class TestBasePlayer:
     def test_action(self):
         player = BasePlayer(AlwaysCooperateBehaviour)
-        assert player.action() == TrustGameActions.COOPERATE
-        assert player.action() == TrustGameActions.COOPERATE
+        assert player.action(player) == TrustGameActions.COOPERATE
+        assert player.action(player) == TrustGameActions.COOPERATE
         assert player.get_action_history() == [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
 
 
