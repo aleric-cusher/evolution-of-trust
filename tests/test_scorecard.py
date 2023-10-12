@@ -1,27 +1,27 @@
 import pytest
 from trust.actions import TrustGameActions
-from trust.score_handler import ScoreHandler
+from trust.scorecard import Scorecard
 from trust.players import RandomPlayer, AlwaysCheatPlayer, AlwaysCooperatePlayer
 
 
-class TestScoreHandler:
+class TestScorecard:
     def test_creation(self):
         players = [RandomPlayer(), AlwaysCheatPlayer(), AlwaysCooperatePlayer()]
         try:
-            score_handler = ScoreHandler(players)
+            score_handler = Scorecard(players)
             assert True
         except Exception as e:
             assert False, e
         
     def test_scorecard_attributes(self):
         player1 = RandomPlayer()
-        score_handler = ScoreHandler([player1])
+        score_handler = Scorecard([player1])
 
         assert score_handler.scorecard[player1] == 0
 
     def test_scorecard_update_score(self):
         player1, player2 = AlwaysCheatPlayer(), AlwaysCooperatePlayer()
-        score_handler = ScoreHandler([player1, player2]) 
+        score_handler = Scorecard([player1, player2]) 
 
         score_handler.update_scores(33, player1)
         score_handler.update_scores(25, player2)
@@ -31,7 +31,7 @@ class TestScoreHandler:
         
     def test_reset_score(self):
         player1, player2 = AlwaysCheatPlayer(), AlwaysCooperatePlayer()
-        score_handler = ScoreHandler([player1, player2])
+        score_handler = Scorecard([player1, player2])
         score_handler.scorecard = {
             player1: 5,
             player2: 6
@@ -43,7 +43,7 @@ class TestScoreHandler:
 
     def test_reset_scorecard(self):
         player1, player2 = AlwaysCheatPlayer(), AlwaysCooperatePlayer()
-        score_handler = ScoreHandler([player1, player2])
+        score_handler = Scorecard([player1, player2])
         score_handler.scorecard = {
             player1: 5,
             player2: 6
@@ -56,7 +56,7 @@ class TestScoreHandler:
     
     def test_get_scores(self):
         player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
-        score_handler = ScoreHandler([player1, player2, player3])
+        score_handler = Scorecard([player1, player2, player3])
         test_card = {
             player1: 5,
             player2: 6,
@@ -72,7 +72,7 @@ class TestScoreHandler:
     
     def test_get_scorecard(self):
         player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
-        score_handler = ScoreHandler([player1, player2, player3])
+        score_handler = Scorecard([player1, player2, player3])
         test_card = {
             player1: 5,
             player2: 6,
@@ -86,14 +86,14 @@ class TestScoreHandler:
 
     def test_add_scores(self):
         player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
-        score_handler1 = ScoreHandler([player1, player2, player3])
+        score_handler1 = Scorecard([player1, player2, player3])
         score_handler1.scorecard = {
             player1: 5,
             player2: 6,
             player3: 2,
         }
 
-        score_handler2 = ScoreHandler([player1, player3])
+        score_handler2 = Scorecard([player1, player3])
         score_handler2.scorecard = {
             player1: -3,
             player3: 8
@@ -111,6 +111,6 @@ class TestScoreHandler:
     
     def test_invalid_type_handler(self):
         player1, player2, player3 = AlwaysCheatPlayer(), AlwaysCooperatePlayer(), RandomPlayer()
-        score_handler1 = ScoreHandler([player1, player2, player3])
+        score_handler1 = Scorecard([player1, player2, player3])
         with pytest.raises(TypeError):
             score_handler3 = score_handler1.add_score_handlers('score_handler2')

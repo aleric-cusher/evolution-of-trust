@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 from trust.players import BasePlayer
 
 
-class ScoreHandler:
+class Scorecard:
     def __init__(self, players: List[BasePlayer]) -> None:
         self.scorecard = {player: 0 for player in players}
 
@@ -26,7 +26,7 @@ class ScoreHandler:
         return self.scorecard
     
     def add_score_handlers(self, other_score_handler):
-        if not isinstance(other_score_handler, ScoreHandler):
+        if not isinstance(other_score_handler, Scorecard):
             raise TypeError('Parameter should be of the type ScoreHandler')
 
         for player in self.scorecard.keys():

@@ -2,7 +2,7 @@ from typing import List
 import itertools
 from trust.players import BasePlayer
 from trust.actions import TrustGameActions
-from trust.score_handler import ScoreHandler
+from trust.scorecard import Scorecard
 
 
 class TrustGame:
@@ -20,9 +20,9 @@ class TrustGame:
         self.player1, self.player2 = player1, player2
         self.player1.new_game(player2)
         self.player2.new_game(player1)
-        self.score_handler = ScoreHandler([self.player1, self.player2])
+        self.score_handler = Scorecard([self.player1, self.player2])
     
-    def play_game(self, num_games: int = 1) -> ScoreHandler:
+    def play_game(self, num_games: int = 1) -> Scorecard:
         if not isinstance(num_games, int):
             raise TypeError('num_games should be of type int.')
         if num_games < 1:
@@ -46,7 +46,7 @@ class TrustTournament:
                 raise TypeError('Invalid player class.')
 
         self.players = players
-        self.score_handler = ScoreHandler(self.players)
+        self.score_handler = Scorecard(self.players)
 
     def play_tournament(self, rounds_per_match: int = 10) -> None:
         for player1, player2 in itertools.combinations(self.players, 2):
