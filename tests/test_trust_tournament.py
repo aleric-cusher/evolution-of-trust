@@ -1,7 +1,6 @@
 import pytest
-from trust.trust_game import TrustTournament
-from trust.actions import TrustGameActions
-from trust.players import AlwaysCooperatePlayer, DetectivePlayer, RandomPlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer
+from trust.trust_tournament import TrustTournament
+from trust.players import AlwaysCooperatePlayer, DetectivePlayer, AlwaysCheatPlayer, CopycatPlayer, GrudgePlayer
 
 
 class TestTrustTournament:
