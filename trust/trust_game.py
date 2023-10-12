@@ -18,6 +18,8 @@ class TrustGame:
             raise TypeError('Invalid player class.')
 
         self.player1, self.player2 = player1, player2
+        self.player1.new_game(player2)
+        self.player2.new_game(player1)
         self.score_handler = ScoreHandler([self.player1, self.player2])
     
     def play_game(self, num_games: int = 1) -> ScoreHandler:
@@ -27,7 +29,7 @@ class TrustGame:
             raise ValueError('Cannot play 0 or negative games.')
         
         for _ in range(num_games):
-            player1_action, player2_action = self.player1.action(self.player2), self.player2.action(self.player1)
+            player1_action, player2_action = self.player1.action(), self.player2.action()
             scores =  self.outcomes[(player1_action, player2_action)]
             self.score_handler.update_scores(scores[0], self.player1)
             self.score_handler.update_scores(scores[1], self.player2)
@@ -52,9 +54,6 @@ class TrustTournament:
             new_score_handler = game.play_game(rounds_per_match)
 
             self.score_handler.add_score_handlers(new_score_handler)
-
-            player1.reset_history()
-            player2.reset_history()
         
         return self.score_handler
 
