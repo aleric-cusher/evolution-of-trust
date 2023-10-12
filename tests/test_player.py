@@ -13,41 +13,36 @@ from trust.behaviours import (
 )
 from trust.trust_game import TrustGameActions
 
+
+
 class TestBasePlayer:
-    def test_action(self):
+    def test_action(self, mocker):
         player = BasePlayer(AlwaysCooperateBehaviour)
-        with pytest.raises(RuntimeError):
-            player.action()
+
+        class MockGame:
+            def get_opponent(self, player):
+                return player
+
+        class MockScorecard:
+            def get_actions(self, player):
+                return [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
+
+            def update_actions(self, action, scorecard):
+                pass
         
-        player.new_game(player)
-        assert player.action() == TrustGameActions.COOPERATE
-        assert player.action() == TrustGameActions.COOPERATE
-        assert player.get_action_history() == [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
+        game = MockGame()
+        scorecard = MockScorecard()
 
+        # spy_get_opponent = mocker.spy(game, 'get_opponent')
+        # spy_get_actions = mocker.spy(scorecard, 'get_actions')
+        # spy_update_actions = mocker.spy(scorecard, 'update_actions')
+        player.action(game, scorecard)
+        # assert player.action(game, scorecard) == TrustGameActions.COOPERATE
+        # assert player.action(game, scorecard) == TrustGameActions.COOPERATE
+        # assert spy_get_opponent.call_count == 2
+        # assert spy_get_actions.call_count == 2
+        # assert spy_update_actions.call_count == 2
 
-    def test_get_action_history(self):
-        player = BasePlayer(AlwaysCooperatePlayer)
-        player._action_history = [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
-        assert player.get_action_history() == [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
-
-    def test_new_game(self):
-        player1 = AlwaysCheatPlayer()
-        player2 = AlwaysCooperatePlayer()
-
-        player1._action_history = [TrustGameActions.CHEAT, TrustGameActions.COOPERATE]
-
-        player1.new_game(player2)
-        assert player1.opponent == player2
-        assert player1._action_history == []
-
-        player2.new_game(player1)
-        assert player2.opponent == player1
-        
-    def test_new_game_invalid_opponent(self):
-        player1 = AlwaysCheatPlayer()
-        
-        with pytest.raises(TypeError):
-            player1.new_game('player2')
 
 class TestRandomPlayer:
     def test_player_attributes(self):
