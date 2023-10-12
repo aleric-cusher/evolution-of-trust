@@ -27,8 +27,7 @@ class TrustGame:
             raise ValueError('Cannot play 0 or negative games.')
         
         for _ in range(num_games):
-            player1_action_history, player2_action_history = self.player1.get_action_history(), self.player2.get_action_history()
-            player1_action, player2_action = self.player1.action(player2_action_history), self.player2.action(player1_action_history)
+            player1_action, player2_action = self.player1.action(self.player2), self.player2.action(self.player1)
             scores =  self.outcomes[(player1_action, player2_action)]
             self.score_handler.update_scores(scores[0], self.player1)
             self.score_handler.update_scores(scores[1], self.player2)
