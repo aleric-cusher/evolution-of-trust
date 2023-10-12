@@ -11,7 +11,7 @@ class Scorecard:
     def get_card(self, player: BasePlayer):
         return deepcopy(self._scorecard.get(player, None))
 
-    def get_score(self, player: BasePlayer) -> Dict[BasePlayer, Dict[str, Any]]:
+    def get_score(self, player: BasePlayer) -> int:
         return self._scorecard[player]['score']
     
     def update_score(self, score: int, player: BasePlayer) -> None:

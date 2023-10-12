@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Type
 from copy import deepcopy
 
 from trust.actions import TrustGameActions
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class BasePlayer:
-    def __init__(self, behaviour: PlayerBehaviour) -> None:
+    def __init__(self, behaviour: Type[PlayerBehaviour]) -> None:
         super().__init__()
         self.behaviour = behaviour
     

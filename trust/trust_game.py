@@ -33,7 +33,7 @@ class TrustGame:
 
         for _ in range(num_games):
             player1_action, player2_action = self.player1.action(self, self.scorecard), self.player2.action(self, self.scorecard)
-            scores =  self.outcomes[(player1_action, player2_action)]
+            scores =  self.outcomes[(player1_action, player2_action)] # type: ignore
             self.scorecard.update_score(scores[0], self.player1)
             self.scorecard.update_score(scores[1], self.player2)
 
