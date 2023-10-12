@@ -16,18 +16,38 @@ from trust.trust_game import TrustGameActions
 class TestBasePlayer:
     def test_action(self):
         player = BasePlayer(AlwaysCooperateBehaviour)
-        assert player.action(player) == TrustGameActions.COOPERATE
-        assert player.action(player) == TrustGameActions.COOPERATE
+        with pytest.raises(RuntimeError):
+            player.action()
+        
+        player.new_game(player)
+        assert player.action() == TrustGameActions.COOPERATE
+        assert player.action() == TrustGameActions.COOPERATE
         assert player.get_action_history() == [TrustGameActions.COOPERATE, TrustGameActions.COOPERATE]
 
 
-    def test_get_action_history_and_reset_history(self):
+    def test_get_action_history(self):
         player = BasePlayer(AlwaysCooperatePlayer)
         player._action_history = [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
         assert player.get_action_history() == [TrustGameActions.CHEAT, TrustGameActions.CHEAT]
 
-        player.reset_history()
-        assert player._action_history == []
+    def test_new_game(self):
+        player1 = AlwaysCheatPlayer()
+        player2 = AlwaysCooperatePlayer()
+
+        player1._action_history = [TrustGameActions.CHEAT, TrustGameActions.COOPERATE]
+
+        player1.new_game(player2)
+        assert player1.opponent == player2
+        assert player1._action_history == []
+
+        player2.new_game(player1)
+        assert player2.opponent == player1
+        
+    def test_new_game_invalid_opponent(self):
+        player1 = AlwaysCheatPlayer()
+        
+        with pytest.raises(TypeError):
+            player1.new_game('player2')
 
 class TestRandomPlayer:
     def test_player_attributes(self):

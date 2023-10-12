@@ -20,6 +20,7 @@ class BasePlayer:
         super().__init__()
         self._action_history = []
         self.behaviour = behaviour
+        self.opponent: BasePlayer = None
     
     def _update_and_return_action_history(self, action: TrustGameActions) -> TrustGameActions:
         self._action_history.append(action)
@@ -28,17 +29,26 @@ class BasePlayer:
     def get_action_history(self) -> List[TrustGameActions]:
         return deepcopy(self._action_history)
     
-    def action(self, opponent: BasePlayer) -> TrustGameActions:
+    def action(self) -> TrustGameActions:
         if self.behaviour is None:
             raise Exception('Please define a behaviour')
-        opponent_history = opponent.get_action_history()
+        
+        if self.opponent is None:
+            raise RuntimeError('Please run the new_game method before calling action.')
+        
+        opponent_history = self.opponent.get_action_history()
         self_history = self.get_action_history()
         min_index = min([len(opponent_history), len(self_history)])
         action = self.behaviour.get_action(opponent_history[: min_index], self_history[: min_index])
         return self._update_and_return_action_history(action)
     
-    def reset_history(self) -> None:
+    def new_game(self, opponent: BasePlayer) -> None:
+        if not isinstance(opponent, BasePlayer):
+            raise TypeError('Parameter: opponent should be of the type BasePlayer')
+        
         self._action_history = []
+        self.opponent = opponent
+    
 
 
 class RandomPlayer(BasePlayer):
