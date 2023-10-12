@@ -43,21 +43,19 @@ class TestTwoPlayerTournament:
         players = [player1_class(), player2_class()]
         tourney = TrustTournament(players)
         tourney.play_tournament(rounds_per_match)
-        scorecard = tourney.score_handler.get_scorecard()
 
-        assert scorecard[players[0]] == player1_score
-        assert scorecard[players[1]] == player2_score
+        assert tourney.scorecard.get_score(players[0]) == player1_score
+        assert tourney.scorecard.get_score(players[1]) == player2_score
     
 
 class TestMultiplePlayersTournament:
     def test_5_different_players(self):
         players = [CopycatPlayer(), AlwaysCheatPlayer(), AlwaysCooperatePlayer(), GrudgePlayer(), DetectivePlayer()]
         tourney = TrustTournament(players)
-        score_handler = tourney.play_tournament()
-        scorecard = score_handler.get_scorecard()
+        scorecard = tourney.play_tournament()
         
-        assert scorecard[players[0]] == 57
-        assert scorecard[players[1]] == 45
-        assert scorecard[players[2]] == 29
-        assert scorecard[players[3]] == 46
-        assert scorecard[players[4]] == 45
+        assert scorecard.get_score(players[0]) == 57
+        assert scorecard.get_score(players[1]) == 45
+        assert scorecard.get_score(players[2]) == 29
+        assert scorecard.get_score(players[3]) == 46
+        assert scorecard.get_score(players[4]) == 45

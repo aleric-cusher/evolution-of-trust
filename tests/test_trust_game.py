@@ -53,8 +53,8 @@ class TestAllActionCombinations:
         score_handler = game.play_game()
         scorecard = score_handler.get_scorecard()
 
-        assert scorecard[player1] == player1_score
-        assert scorecard[player2] == player2_score
+        assert game.scorecard.get_score(player1) == player1_score
+        assert game.scorecard.get_score(player2) == player2_score
 
 
 class TestGamesBetweenSamePlayers:
@@ -62,46 +62,43 @@ class TestGamesBetweenSamePlayers:
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCooperatePlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
+        scorecard = game.scorecard.get_scorecard()
 
-        assert scorecard[player1] == 20
-        assert scorecard[player2] == 20
+        assert game.scorecard.get_score(player1) == 20
+        assert game.scorecard.get_score(player2) == 20
 
     def test_always_cheat_player_tournament(self):
         player1, player2 = AlwaysCheatPlayer(), AlwaysCheatPlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
+        scorecard = game.scorecard.get_scorecard()
 
-        assert scorecard[player1] == 0
-        assert scorecard[player2] == 0
+        assert game.scorecard.get_score(player1) == 0
+        assert game.scorecard.get_score(player2) == 0
     
     def test_copycat_player_tournament(self):
         player1, player2 = CopycatPlayer(), CopycatPlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
 
-        assert scorecard[player1] == 20
-        assert scorecard[player2] == 20
+        assert game.scorecard.get_score(player1) == 20
+        assert game.scorecard.get_score(player2) == 20
     
     def test_grudge_player_tournament(self):
         player1, player2 = GrudgePlayer(), GrudgePlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
 
-        assert scorecard[player1] == 20
-        assert scorecard[player2] == 20
+        assert game.scorecard.get_score(player1) == 20
+        assert game.scorecard.get_score(player2) == 20
     
     def test_detective_player_tournament(self):
         player1, player2 = DetectivePlayer(), DetectivePlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
 
-        assert scorecard[player1] == 18
-        assert scorecard[player2] == 18
+        assert game.scorecard.get_score(player1) == 18
+        assert game.scorecard.get_score(player2) == 18
     
 
 class TestGamesBetweenDifferentPlayers:
@@ -112,10 +109,9 @@ class TestGamesBetweenDifferentPlayers:
         player1, player2 = AlwaysCooperatePlayer(), AlwaysCheatPlayer()
         game = TrustGame(player1, player2)
         game.play_game(10)
-        scorecard = game.score_handler.get_scorecard()
 
-        assert scorecard[player1] == -10
-        assert scorecard[player2] == 30
+        assert game.scorecard.get_score(player1) == -10
+        assert game.scorecard.get_score(player2) == 30
     
     with_random_player_parameters = [
         # (player1_class, player2_class, num_games, player1_score, player2_score)
@@ -131,10 +127,9 @@ class TestGamesBetweenDifferentPlayers:
         player1, player2 = player1_class(), player2_class()
         game = TrustGame(player1, player2)
         game.play_game(num_games)
-        scorecard = game.score_handler.get_scorecard()
 
-        assert scorecard[player1] == player1_score
-        assert scorecard[player2] == player2_score
+        assert game.scorecard.get_score(player1) == player1_score
+        assert game.scorecard.get_score(player2) == player2_score
         assert spy.call_count == num_games
     
     without_random_player_parameters = [
@@ -155,8 +150,7 @@ class TestGamesBetweenDifferentPlayers:
         player1, player2 = player1_class(), player2_class()
         game = TrustGame(player1, player2)
         game.play_game(num_games)
-        scorecard = game.score_handler.get_scorecard()
-
-        assert scorecard[player1] == player1_score
-        assert scorecard[player2] == player2_score
+        
+        assert game.scorecard.get_score(player1) == player1_score
+        assert game.scorecard.get_score(player2) == player2_score
 

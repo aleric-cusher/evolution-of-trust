@@ -18,23 +18,31 @@ class TrustGame:
             raise TypeError('Invalid player class.')
 
         self.player1, self.player2 = player1, player2
-        self.player1.new_game(player2)
-        self.player2.new_game(player1)
-        self.score_handler = Scorecard([self.player1, self.player2])
-    
+        self.scorecard = Scorecard([self.player1, self.player2])
+
+    def get_opponent(self, player: BasePlayer):
+        if self.player1 == player:
+            return self.player2
+        else:
+            return self.player1
+
     def play_game(self, num_games: int = 1) -> Scorecard:
         if not isinstance(num_games, int):
             raise TypeError('num_games should be of type int.')
         if num_games < 1:
             raise ValueError('Cannot play 0 or negative games.')
-        
+
         for _ in range(num_games):
-            player1_action, player2_action = self.player1.action(), self.player2.action()
+            player1_action, player2_action = self.player1.action(self, self.scorecard), self.player2.action(self, self.scorecard)
             scores =  self.outcomes[(player1_action, player2_action)]
-            self.score_handler.update_scores(scores[0], self.player1)
-            self.score_handler.update_scores(scores[1], self.player2)
-        
-        return self.score_handler
+            self.scorecard.update_score(scores[0], self.player1)
+            self.scorecard.update_score(scores[1], self.player2)
+
+        return self.scorecard
+    
+    def end_game(self):
+        self.scorecard.reset_actions(self.player1)
+        self.scorecard.reset_actions(self.player2)
 
 
 class TrustTournament:
@@ -46,14 +54,14 @@ class TrustTournament:
                 raise TypeError('Invalid player class.')
 
         self.players = players
-        self.score_handler = Scorecard(self.players)
+        self.scorecard = Scorecard(self.players)
 
-    def play_tournament(self, rounds_per_match: int = 10) -> None:
+    def play_tournament(self, rounds_per_match: int = 10) -> Scorecard:
         for player1, player2 in itertools.combinations(self.players, 2):
             game = TrustGame(player1, player2)
-            new_score_handler = game.play_game(rounds_per_match)
+            new_score_card = game.play_game(rounds_per_match)
 
-            self.score_handler.add_score_handlers(new_score_handler)
-        
-        return self.score_handler
+            self.scorecard.add_scores(new_score_card)
+            game.end_game()
+        return self.scorecard
 
